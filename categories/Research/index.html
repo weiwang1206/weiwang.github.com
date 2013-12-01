@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   
-  <title>OpenStack | Wei's Blog</title>
+  <title>Research | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
   
@@ -66,7 +66,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title category">OpenStack</h2>
+<h2 class="archive-title category">Research</h2>
 
 
   
@@ -76,26 +76,70 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2013-11-30T08:22:54.000Z"><a href="/2013/11/30/openstack-overview/">11月 30 2013</a></time>
+        <time datetime="2013-12-01T12:14:10.000Z"><a href="/2013/12/01/flow-schedule-1/">12月 1 2013</a></time>
       
       
   
-    <h1 class="title"><a href="/2013/11/30/openstack-overview/">Openstack开篇</a></h1>
+    <h1 class="title"><a href="/2013/12/01/flow-schedule-1/">数据中心网络Flow Schedule</a></h1>
   
 
     </header>
     <div class="entry">
       
-        <p>实验室一直在在CENI项目，我们课题组打杂帮忙做一个vrouter网管系统，本来以为打打酱油，但后来发现了OpenStack，和我们项目差不多，只不过OpenStack管理vm我们管理vrouter。因此来学习下OpenStack的管理方式。</p>
+        <p>当今各大互联网公司的访问量呈爆炸式增长，巨大的访问量对其DataCenter造成巨大的压力，尤其是数据中心内部网络。数据中心现有的业务很多也是Deadline-aware的，比如Web search，social network，recommendation system等，每多1ms的延迟，就会造成很大的损失，这不是危言损听。而且这些业务也都有SLA（Service Level Agreement）的要求，大概数字在300ms左右[D2TCP]。因此，保证DC内部网络的软实时性很重要。</p>
+<p><strong>Datacenter Network 背景及Traffic特征</strong></p>
+<p>（比较零碎，等形成完整的思路再整合）</p>
+<ul>
+<li>内部拓扑基本上就是Spine-Leaf</li>
+</ul>
+<p><img src="/img/spine_leaf" alt="spine_leaf"></p>
+<ul>
+<li>现在的数据中心99%的traffic跑着TCP连接[DCTCP]</li>
+</ul>
+<ul>
+<li>traffic中绝大多数是deadline aware short flow；也有少数的elephant long flow，但没有严格的deadline，占据着较大的带宽；两种类型的flow混合着争夺着现有的带宽资源。</li>
+</ul>
+<ul>
+<li>带宽基本就是edge switch出口1G最多10G，core switch 10G。</li>
+</ul>
+<ul>
+<li>switch的buffer很小，大概在百K左右，上M的少，不过Cisco有16M的，但是总体来说不大。尤其是数据中心里都是普通commodity switch。而且这个仅有的buffer也是各端口共享的。buffer用来干嘛？queue！</li>
+</ul>
+<ul>
+<li>traffic pattern主要是partition-aggregation，比如web search和hadoop。这就带来了incast问题。</li>
+</ul>
+<p><strong>传统TCP为什么不能胜任</strong></p>
+<p>这个主要还是没有很好的解决incast的问题，引起这个的原因基本就是如果一个switch同时接受了很多flow，超过buffer之后肯定是要丢包的，丢包会引起TCP重传，但是重传是由RTO控制的，RTO长了延时过长，RTO短了既浪费带宽又导致队列长度过长也增加了延时。</p>
+<p>而且基本上对网络资源的利用也是fair sharing，在switch里基本就是FCFS。</p>
+<p><strong>Related Work</strong></p>
+<p>在学术界，近几年对这个问题比较关注，都在flow schedule方面发文章，从sigcom09到sigcomm13都有相关的文章。</p>
+<p>不过大约分为两类</p>
+<p>一类是不关注路径，single path，但是关注congestion contrll，rate controll，及交换机根据优先级进行处理</p>
+<p>一类是类似Load Balance的，专注multipath。</p>
+<p><strong>第一类代表文章</strong></p>
+<hr>
+<p>DCTCP （2010） —&gt; D3 （2011） —&gt; D2TCP &amp; PDQ &amp; Detail （2012） —&gt; pFabric &amp; OVN （2013）</p>
+<hr>
+<p>分别对每篇文章的方法，优势和劣势做下简单总结（等慢慢丰富）：</p>
+<p><strong>DCTCP</strong></p>
+<p>方法：使用优化的ECN，就是使用连续几个EC bit来计算网络拥塞程度，来调节TCP的window size从而控制拥塞，switch保持较低的值。</p>
+<p>优势：充分分析了DCN traffic，较早提出这个方法</p>
+<p>劣势：fair shareing，不关注deadline，无法保证SLA</p>
+<hr>
+<p><strong>D3</strong></p>
+<p>方法：使用贪心的方法，根据deadline和remaining flow size来确定一个rate，然后由switch为每个flow预留带宽。</p>
+<p>优势：提出使用deadline aware的方法保证按时交付和FCT</p>
+<p>缺陷：使用贪心的方法，导致先来的flow可能阻碍稍微后来一点的更重要的flow的延迟。先来先服务。</p>
+<p><strong>PDQ</strong></p>
+<p>方法：提出抢占式，后来的高优先级的可以是之前的flow先pause，就是针对D3的问题解决的。</p>
+<p>优势：抢占式很好，但是还有有些小问题，比如flow平滑过度，utilization等问题</p>
+<p>劣势：没看出来，在pFabric里说不好实现之类的</p>
+<p>（未完待续）</p>
 
       
     </div>
     <footer>
       
-        
-          <div class="alignleft">
-            <a href="/2013/11/30/openstack-overview/#more" class="more-link">Read More</a>
-          </div>
         
         
       
