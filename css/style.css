@@ -11,7 +11,7 @@
 }
 body {
   background: #120a0a;
-  color: #fff;
+  color: #444;
   font-family: "yahei", "Helvetica Neue", "Helvetica", Arial, sans-serif;
   font-size: 14px;
   text-shadow: 0 0 1px transparent;
@@ -268,7 +268,7 @@ article header .title {
   font-weight: normal;
 }
 article header .title a {
-  color: #fff;
+  color: #444;
 }
 article header .title a:hover {
   color: #258fb8;
@@ -605,7 +605,7 @@ article footer .addthis iframe {
   color: #999;
 }
 #sidebar .search input:focus {
-  color: #fff;
+  color: #444;
 }
 #sidebar .tag small {
   margin-left: 15px;
