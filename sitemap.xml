@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://weiwang1206.github.io/about/index.html</loc>
+    <lastmod>2014-10-29T15:40:38.000Z</lastmod>
+  </url>
+  <url>
     <loc>http://weiwang1206.github.io/2014/10/29/SYD1/</loc>
     <lastmod>2014-10-29T15:11:24.000Z</lastmod>
   </url>
@@ -15,10 +19,6 @@
   <url>
     <loc>http://weiwang1206.github.io/2013/12/03/l3_switch/</loc>
     <lastmod>2013-12-03T08:10:33.000Z</lastmod>
-  </url>
-  <url>
-    <loc>http://weiwang1206.github.io/about/index.html</loc>
-    <lastmod>2013-12-02T04:56:37.000Z</lastmod>
   </url>
   <url>
     <loc>http://weiwang1206.github.io/2013/11/30/openstack-overview/</loc>
