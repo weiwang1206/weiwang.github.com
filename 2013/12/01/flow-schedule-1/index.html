@@ -142,6 +142,9 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <p>优势：比ECMP静态的路径要有优势，可以充分利用多条路径，避开繁忙的链路</p>
 <p>缺陷：流在过程中会改变路径，调度算法太简单，没有抢占，没有优先级，在共享内存的交换机中，简单的流调度可能不好，因为elephant background flow可能占据了大量的内存，这样的flow应该为deadline aware的流做出让步。Flow的带宽预测有些weight，其实根据deadline和flow size就可以确定一个流的重要性了。Schedule的运行频率也是一个影响performance的因素，频率太小，效果不明显，频率高造成浪费资源。</p>
 <p>基于Hedera这里可以写一个Flow schedule算法</p>
+<p><strong>Per-packet Load-balanced low latency routing for clos-based data center Networks</strong></p>
+<p>这篇文章的核心思想是为Clos based network（比如Fat tree，VL2）提供packet level的load balanced算法，这个算法DRB在server端选择一个core switch作为其中转的destination（IP in IP，在core switch 解包发到真正的destination），并且根据拓扑的特性，确定唯一的路径，使用静态路由</p>
+<p>缺点：re-odering，switch解包，需要server知道拓扑状态尤其是所有的core switch（其实这一步感觉在网络中做更好，host端做好rate control就好了），静态路由扩展性较差</p>
 <p>（未完待续）</p>
 
       
@@ -254,7 +257,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   </div>
   <footer id="footer" class="inner"><div class="alignleft">
   
-  &copy; 2013 Wei Wang
+  &copy; 2014 Wei Wang
   
 </div>
 <div class="clearfix"></div></footer>
