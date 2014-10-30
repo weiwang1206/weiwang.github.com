@@ -7,9 +7,9 @@
   <title>Floodlight No.3 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="Controller (core/internal/Controller.java)
-
-Controller类实现了IFloodlightProviderService服务。FloodlightProrider类中定义了controller的对象，作为一个模块出现。IFloodlightProvid">
+  <meta name="description" content="Controller (core/internal/Controller.java)(1)
+Controller类实现了IFloodlightProviderService服务。FloodlightProrider类中定义了controller的对象，作为一个模块出现。IFloodlightProviderService定义了controller和switch通信的接口。Controller类实现了控制器和交换机之间的交互。
+IFloodlightProviderService服务接口">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -75,7 +75,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-10-30T13:16:47.000Z"><a href="/2014/10/30/floodlight03/">10月 30 2014</a></time>
+        <time datetime="2014-10-30T13:46:20.000Z"><a href="/2014/10/30/floodlight03/">10月 30 2014</a></time>
       
       
   
@@ -85,11 +85,9 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     </header>
     <div class="entry">
       
-        <h2>Controller (core/internal/Controller.java)</h2>
-<p><img src="/img/floodlight03-controller.png" alt="控制器运行过程"></p>
+        <h2>Controller (core/internal/Controller.java)(1)</h2>
 <p>Controller类实现了IFloodlightProviderService服务。FloodlightProrider类中定义了controller的对象，作为一个模块出现。IFloodlightProviderService定义了controller和switch通信的接口。Controller类实现了控制器和交换机之间的交互。</p>
-<p><strong>IFloodlightProviderService服务接口</strong></p>
-<p>首先，在该接口中定义了控制器的角色，包括：EQUAL, MASTER, SLAVE。</p>
+<p><strong>IFloodlightProviderService服务接口</strong><br><a id="more"></a><br>首先，在该接口中定义了控制器的角色，包括：EQUAL, MASTER, SLAVE。</p>
 <pre><code>public static final FloodlightContextStore<span class="tag">&lt;<span class="title">Ethernet</span>&gt;</span> bcStore = new FloodlightContextStore<span class="tag">&lt;<span class="title">Ethernet</span>&gt;</span>();</code></pre>
 <p>新建FloodlightContextStore 对象，bcStore对象提供了FloodlightContext对象的操作方法，包括get，put，remove。而FloodlightContext对象实际上是一个map对象，用来存储事件的上下文信息（如packet-in payload）。</p>
 <pre><code><span class="title">public</span> synchronized void addOFMessageListener(<span class="type">OFType</span> <span class="typedef"><span class="keyword">type</span>, <span class="type">IOFMessageListener</span> listener) <span class="container">{
@@ -247,7 +245,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">分类</h3>
   <ul class="entry">
   
-    <li><a href="/categories/Floodlight/">Floodlight</a><small>2</small></li>
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>3</small></li>
   
     <li><a href="/categories/Network/">Network</a><small>2</small></li>
   
@@ -268,11 +266,11 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>2</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>3</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
-    <li><a href="/tags/Floodlight/">Floodlight</a><small>2</small></li>
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>3</small></li>
   
     <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
   
