@@ -8,6 +8,7 @@
   <meta name="author" content="Wei Wang">
   
   <meta name="description" content="Controller (core/internal/Controller.java)(2)
+
 本文主要介绍controller中的run函数，run函数的运行图如上图。">
   
   
@@ -74,7 +75,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-10-30T13:46:27.000Z"><a href="/2014/10/30/floodlight04/">10月 30 2014</a></time>
+        <time datetime="2014-10-30T14:14:35.000Z"><a href="/2014/10/30/floodlight04/">10月 30 2014</a></time>
       
       
   
@@ -85,7 +86,8 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <div class="entry">
       
         <h2>Controller (core/internal/Controller.java)(2)</h2>
-<p><img src="/img/floodlight03-controller.png" alt="控制器运行过程"><br><a id="more"></a><br>本文主要介绍controller中的run函数，run函数的运行图如上图。<br><a id="more"></a><br>    public void run() {<br>        if (log.isDebugEnabled()) {<br>            logListeners();<br>        }<br>        try {<br>           final ServerBootstrap bootstrap = createServerBootStrap(); //新建bootstrap server，用于与交换机之间通信</p>
+<p><img src="/img/floodlight03-controller.png" alt="控制器运行过程"></p>
+<p>本文主要介绍controller中的run函数，run函数的运行图如上图。<br><a id="more"></a><br>    public void run() {<br>        if (log.isDebugEnabled()) {<br>            logListeners();<br>        }<br>        try {<br>           final ServerBootstrap bootstrap = createServerBootStrap(); //新建bootstrap server，用于与交换机之间通信</p>
 <pre><code>        bootstrap<span class="variable">.setOption</span>(<span class="string">"reuseAddr"</span>, <span class="literal">true</span>);
         bootstrap<span class="variable">.setOption</span>(<span class="string">"child.keepAlive"</span>, <span class="literal">true</span>);
         bootstrap<span class="variable">.setOption</span>(<span class="string">"child.tcpNoDelay"</span>, <span class="literal">true</span>);
@@ -290,7 +292,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">分类</h3>
   <ul class="entry">
   
-    <li><a href="/categories/Floodlight/">Floodlight</a><small>3</small></li>
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
   
     <li><a href="/categories/Network/">Network</a><small>2</small></li>
   
@@ -311,11 +313,11 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>3</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>6</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
-    <li><a href="/tags/Floodlight/">Floodlight</a><small>3</small></li>
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>6</small></li>
   
     <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
   

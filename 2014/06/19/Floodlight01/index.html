@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   
-  <title>Wei's Blog</title>
+  <title>Floodlight No.1 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
   <meta name="description" content="Floodlight 学习笔记—No.1
@@ -15,7 +15,7 @@ Floodlight采用模块化的方法加载各种服务。
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="Floodlight No.1"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -80,7 +80,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
       
   
-    <h1 class="title"></h1>
+    <h1 class="title">Floodlight No.1</h1>
   
 
     </header>
@@ -90,13 +90,24 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <p>Floodlight采用模块化的方法加载各种服务。</p>
 <p>在各个模块中，FloodlightProvider模块，起到统领的作用，提供IFloodlightProviderService服务，具体来说就是提供controller服务。</p>
 <p>在main函数中，在加载完毕各种模块之后，获取FloodlightProviderService对象，即controller对象，执行其run函数。</p>
+<p>本系列博客文章针对版本号为0.90的Floodlight源码进行分析，旨在学习基本的SDN控制器的结构组成，运行原理，并与读者分享与讨论。鉴于能力有限，欢迎指出错误并指正。</p>
 
       
     </div>
     <footer>
       
         
+  
+  <div class="categories">
+    <a href="/categories/Floodlight/">Floodlight</a>
+  </div>
+
         
+  
+  <div class="tags">
+    <a href="/tags/Floodlight/">Floodlight</a>, <a href="/tags/Controller/">Controller</a>
+  </div>
+
         
   <div class="addthis addthis_toolbox addthis_default_style">
     
@@ -152,7 +163,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">分类</h3>
   <ul class="entry">
   
-    <li><a href="/categories/Floodlight/">Floodlight</a><small>3</small></li>
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
   
     <li><a href="/categories/Network/">Network</a><small>2</small></li>
   
@@ -173,11 +184,11 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>3</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>6</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
-    <li><a href="/tags/Floodlight/">Floodlight</a><small>3</small></li>
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>6</small></li>
   
     <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
   
