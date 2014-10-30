@@ -4,15 +4,18 @@
   <meta charset="utf-8">
   
   
-  <title>Sydney | Wei's Blog</title>
+  <title>Floodlight No.2 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="在悉尼参加会议时拍的照片">
+  <meta name="description" content="代码结构
+Floodlight代码总体上分为两部分：floodlight controller和openflow协议。floodlightcontroller部分包含了控制器的核心部件(core)，各个服务模块(module)以及相关工具组件。Openflow部分主要定义了openflow协议标准。Floodlight由各个模块组成，每个模块又可以提供不同的服务。
+控制器核心组件（core）
+Floodlight通过模块的方式来提供控制器的扩展性，core组件负责组件核心框架，包括网络通信，模块接口等，是其他模块的基础。首先，从main函数开始。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Sydney"/>
+  <meta property="og:title" content="Floodlight No.2"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -73,20 +76,60 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-10-29T15:11:24.000Z"><a href="/2014/10/29/SYD1/">10月 29 2014</a></time>
+        <time datetime="2014-10-30T13:16:47.000Z"><a href="/2014/10/30/Floodlight02/">10月 30 2014</a></time>
       
       
   
-    <h1 class="title">Sydney</h1>
+    <h1 class="title">Floodlight No.2</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>在悉尼参加会议时拍的照片<br><img src="/img/Opera1.JPG" alt="歌剧院"></p>
-<a id="more"></a>
+        <h2>代码结构</h2>
+<p>Floodlight代码总体上分为两部分：floodlight controller和openflow协议。floodlightcontroller部分包含了控制器的核心部件(core)，各个服务模块(module)以及相关工具组件。Openflow部分主要定义了openflow协议标准。Floodlight由各个模块组成，每个模块又可以提供不同的服务。</p>
+<h2>控制器核心组件（core）</h2>
+<p>Floodlight通过模块的方式来提供控制器的扩展性，core组件负责组件核心框架，包括网络通信，模块接口等，是其他模块的基础。首先，从main函数开始。<br><a id="more"></a></p>
+<h2>Main函数</h2>
+<pre><code>public static void main(String[] args) throws FloodlightModuleException {
+    // Setup logger
+    System<span class="preprocessor">.setProperty</span>(<span class="string">"org.restlet.engine.loggerFacadeClass"</span>, 
+            <span class="string">"org.restlet.ext.slf4j.Slf4jLoggerFacade"</span>)<span class="comment">;</span>
 
-<p><img src="/img/Opera2.JPG" alt="歌剧院"><br><img src="/img/bodi.JPG" alt="邦迪海滩"><br><img src="/img/SYDU.JPG" alt="悉尼大学"></p>
+    CmdLineSettings settings = new CmdLineSettings()<span class="comment">;</span>
+    CmdLineParser parser = new CmdLineParser(settings)<span class="comment">;</span>
+    try {
+        parser<span class="preprocessor">.parseArgument</span>(args)<span class="comment">;</span>
+    } catch (CmdLineException e) {
+        parser<span class="preprocessor">.printUsage</span>(System<span class="preprocessor">.out</span>)<span class="comment">;</span>
+        System<span class="preprocessor">.exit</span>(<span class="number">1</span>)<span class="comment">;</span>
+    }
+
+    // Load modules
+    FloodlightModuleLoader fml = new FloodlightModuleLoader()<span class="comment">;</span>
+    IFloodlightModuleContext moduleContext = fml<span class="preprocessor">.loadModulesFromConfig</span>(settings<span class="preprocessor">.getModuleFile</span>())<span class="comment">;</span>
+    // Run REST server
+    IRestApiService restApi = moduleContext<span class="preprocessor">.getServiceImpl</span>(IRestApiService<span class="preprocessor">.class</span>)<span class="comment">;</span>
+    restApi<span class="preprocessor">.run</span>()<span class="comment">;</span>
+    // Run the main floodlight module
+    IFloodlightProviderService controller =
+            moduleContext<span class="preprocessor">.getServiceImpl</span>(IFloodlightProviderService<span class="preprocessor">.class</span>)<span class="comment">;</span>
+    // This <span class="keyword">call</span> blocks, it has to be the last line <span class="keyword">in</span> the main
+    controller<span class="preprocessor">.run</span>()<span class="comment">;</span>
+}</code></pre>
+<p>在main函数中，首先读取并解析命令行参数。然后从默认配置文件中加载需要加载的模块(fml.loadModulesFromConfig(settings.getModuleFile()))。默认配置文件为config/floodlight.properties，该文件保存着需要加载的模块的类的路径。追踪该函数可以发现，最终调用loadModuleFromList函数,该函数首先调用findAllModules(configMods)函数，该函数建立三个map</p>
+<ul>
+<li>serviceMap -&gt; Maps a service to a module</li>
+<li>moduleServiceMap -&gt; Maps a module to all the services it provides</li>
+<li>moduleNameMap -&gt; Maps the string name to the module</li>
+</ul>
+<p>其次，遍历加载每一个模块及其依赖的模块，如果该模块中提供的service被设置为ignored，则不加载该模块。</p>
+<p>在loadModulesFromList的最后调用parseConfigParameters,initModues和startpuModules函数,进行模块的配置、初始化、和启动。</p>
+<pre><code><span class="function"><span class="title">parseConfigParameters</span><span class="params">(prop)</span>;
+<span class="title">initModules</span><span class="params">(module<span class="variable">Set</span>)</span>;
+<span class="title">startupModules</span><span class="params">(module<span class="variable">Set</span>)</span>;</code></pre>
+<p>InitModules函数加载各个模块的service，并加入floodlightModuleContext中,最后调用每个模块的init函数<br>startpuModules函数调用每个模块的startup函数。</p>
+<p>Main函数，然后启动REST服务器，接收RESTful API调用。最后从moduleContext获取IFloodlightProviderService的实现类，实际上controller类（core/internal/Controller.java）实现了该接口。最后调用run函数启动controller。</p>
 
       
     </div>
@@ -95,13 +138,13 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         
   
   <div class="categories">
-    <a href="/categories/Photo/">Photo</a>
+    <a href="/categories/Floodlight/">Floodlight</a>
   </div>
 
         
   
   <div class="tags">
-    <a href="/tags/Photo/">Photo</a>
+    <a href="/tags/Floodlight/">Floodlight</a>, <a href="/tags/Controller/">Controller</a>
   </div>
 
         
