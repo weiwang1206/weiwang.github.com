@@ -4,16 +4,18 @@
   <meta charset="utf-8">
   
   
-  <title>Floodlight No.6 | Wei's Blog</title>
+  <title>Ryu文档-1-开始 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="TopologyManager Module
-该模块接收LinkDiscover的跟新消息，当有链路跟新时，将重新计算topo。主要调用TopologyInstance类中的compute函数。compute函数即注释如下">
+  <meta name="description" content="1.1 什么是Ryu
+Ryu是一套基于组件的软件定义网络的框架。
+Ryu提供了一套软件组件和高效的API，使网络开发者在开发网络管理控制应用时更加方便快捷。Ryu支持各种南向接口来控制网络设备，如OpenFlow，Netconf，OF-config等。Ryu支持OpenFlow 1.0，1.2，1.3，1.4版本和Nicira扩展。
+Ryu所有源代码都是开源的，遵循 Apache 2.0 license。Ryu完全有Python编写。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Floodlight No.6"/>
+  <meta property="og:title" content="Ryu文档-1-开始"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -74,42 +76,31 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-10-30T14:26:36.000Z"><a href="/2014/10/30/floodlight06/">10月 30 2014</a></time>
+        <time datetime="2014-11-05T15:39:29.000Z"><a href="/2014/11/05/RyuDoc1/">11月 5 2014</a></time>
       
       
   
-    <h1 class="title">Floodlight No.6</h1>
+    <h1 class="title">Ryu文档-1-开始</h1>
   
 
     </header>
     <div class="entry">
       
-        <h2>TopologyManager Module</h2>
-<p>该模块接收LinkDiscover的跟新消息，当有链路跟新时，将重新计算topo。主要调用TopologyInstance类中的compute函数。compute函数即注释如下<br><a id="more"></a><br>    public void compute() {</p>
-<pre><code>    <span class="regexp">//</span> Step <span class="number">1</span>: Compute clusters ignoring broadcast domain links
-    <span class="regexp">//</span> Create nodes <span class="keyword">for</span> clusters <span class="keyword">in</span> the higher level topology
-    <span class="regexp">//</span> Must ignore blocked links.
-    identifyOpenflowDomains();<span class="regexp">//</span>利用强连通分量Tarjan算法，将topo划分强连通子树
-
-    <span class="regexp">//</span> Step <span class="number">1.1</span>: Add links to clusters
-    <span class="regexp">//</span> Avoid adding blocked links to clusters
-    addLinksToOpenflowDomains();<span class="regexp">//</span>将同属于一个连通分量的<span class="keyword">switch</span>的link添加到连通分量中
-
-    <span class="regexp">//</span> Step <span class="number">2.</span> Compute shortest path trees <span class="keyword">in</span> each cluster <span class="keyword">for</span> 
-    <span class="regexp">//</span> unicast routing.  The trees are rooted at the destination.
-    <span class="regexp">//</span> Cost <span class="keyword">for</span> tunnel links <span class="keyword">and</span> direct links are the same.
-    calculateShortestPathTreeInClusters();<span class="regexp">//</span>使用dijstra算法，计算一个cluster内部的所有点最短路径
-
-    <span class="regexp">//</span> Step <span class="number">3.</span> Compute broadcast tree <span class="keyword">in</span> each cluster.
-    <span class="regexp">//</span> Cost <span class="keyword">for</span> tunnel links are high to discourage use <span class="keyword">of</span> 
-    <span class="regexp">//</span> tunnel links.  The cost <span class="keyword">is</span> set to the number <span class="keyword">of</span> nodes
-    <span class="regexp">//</span> <span class="keyword">in</span> the cluster + <span class="number">1</span>, to use as minimum number <span class="keyword">of</span> 
-    <span class="regexp">//</span> clusters as possible.
-    calculateBroadcastNodePortsInClusters();
-
-    <span class="regexp">//</span> Step <span class="number">4.</span> print topology.
-    <span class="regexp">//</span> printTopology();
-}</code></pre>
+        <h2>1.1 什么是Ryu</h2>
+<p>Ryu是一套基于组件的软件定义网络的框架。</p>
+<p>Ryu提供了一套软件组件和高效的API，使网络开发者在开发网络管理控制应用时更加方便快捷。Ryu支持各种南向接口来控制网络设备，如OpenFlow，Netconf，OF-config等。Ryu支持OpenFlow 1.0，1.2，1.3，1.4版本和Nicira扩展。</p>
+<p>Ryu所有源代码都是开源的，遵循 Apache 2.0 license。Ryu完全有Python编写。<br><a id="more"></a></p>
+<h2>1.2 快速入门</h2>
+<p>安装Ryu非常简单，在linux命令行下输入</p>
+<pre><code>% pip <span class="keyword">install</span> ryu</code></pre>
+<p>pip是Python包管理工具，具体可见<a href="https://pypi.python.org/pypi/pip" title="pip" target="_blank"><a href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a></a></p>
+<p>如果你热衷于使用源码安装Ryu，可以使用Git下载源码，并安装</p>
+<pre><code>% git clone git://github<span class="preprocessor">.com</span>/osrg/ryu<span class="preprocessor">.git</span>
+% cd ryu<span class="comment">; python ./setup.py install</span></code></pre>
+<p>如果你想了解在Openstack中如何使用Ryu，请参见<a href="http://ryu.readthedocs.org/en/latest/using_with_openstack.html" target="_blank">详细文档</a>。你可以VLAN使用创建许多隔离的虚拟网络。 Ryu在Openstack的E版本中出现。<br>如果你系那个要编写你自己的Ryu的应用，可以参考<a href="http://ryu.readthedocs.org/en/latest/writing_ryu_app.html" target="_blank">Writing ryu application</a>文档。编写完成后，只需要简单的输入</p>
+<pre><code>% ryu-manager <span class="filename">yourapp.py</code></pre>
+<h2>1.3 Support</h2>
+<p>Ryu的官方网站是<a href="http://osrg.github.io/ryu/" target="_blank"><a href="http://osrg.github.io/ryu/">http://osrg.github.io/ryu/</a></a></p>
 
       
     </div>
@@ -118,13 +109,13 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         
   
   <div class="categories">
-    <a href="/categories/Floodlight/">Floodlight</a>
+    <a href="/categories/Ryu/">Ryu</a>
   </div>
 
         
   
   <div class="tags">
-    <a href="/tags/Floodlight/">Floodlight</a>, <a href="/tags/Controller/">Controller</a>
+    <a href="/tags/Ryu/">Ryu</a>, <a href="/tags/Controller/">Controller</a>
   </div>
 
         
