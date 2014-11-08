@@ -4,18 +4,16 @@
   <meta charset="utf-8">
   
   
-  <title>Ryu文档-1-开始 | Wei's Blog</title>
+  <title>Ryu文档-2-1-第一个Ryu应用 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="1.1 什么是Ryu
-Ryu是一套基于组件的软件定义网络的框架。
-Ryu提供了一套软件组件和高效的API，使网络开发者在开发网络管理控制应用时更加方便快捷。Ryu支持各种南向接口来控制网络设备，如OpenFlow，Netconf，OF-config等。Ryu支持OpenFlow 1.0，1.2，1.3，1.4版本和Nicira扩展。
-Ryu所有源代码都是开源的，遵循 Apache 2.0 license。Ryu完全有Python编写。">
+  <meta name="description" content="2.1 第一个Ryu应用
+如果你想用自己的方式来管理网络设备，比如路由器、交换机等，你可以自己来编写一个Ryu的应用程序来实现你的想法。你的应用程序可以告诉Ryu来如何管理这些设备，然后Ryu通过OpenFlow协议来管理设备。编写Ryu应用程序非常简单，直接通过Python脚本就可以实现了。接下来我们就看看如果写一个简单的Ryu应用。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="Ryu文档-1-开始"/>
+  <meta property="og:title" content="Ryu文档-2-1-第一个Ryu应用"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -76,33 +74,49 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-11-05T15:39:29.000Z"><a href="/2014/11/05/RyuDoc1/">11月 5 2014</a></time>
+        <time datetime="2014-11-08T12:04:42.000Z"><a href="/2014/11/08/RyuDoc2/">11月 8 2014</a></time>
       
       
   
-    <h1 class="title">Ryu文档-1-开始</h1>
+    <h1 class="title">Ryu文档-2-1-第一个Ryu应用</h1>
   
 
     </header>
     <div class="entry">
       
-        <h2>1.1 什么是Ryu</h2>
-<p>Ryu是一套基于组件的软件定义网络的框架。</p>
-<p>Ryu提供了一套软件组件和高效的API，使网络开发者在开发网络管理控制应用时更加方便快捷。Ryu支持各种南向接口来控制网络设备，如OpenFlow，Netconf，OF-config等。Ryu支持OpenFlow 1.0，1.2，1.3，1.4版本和Nicira扩展。</p>
-<p>Ryu所有源代码都是开源的，遵循 Apache 2.0 license。Ryu完全有Python编写。<br><a id="more"></a></p>
-<h2>1.2 快速入门</h2>
-<p>安装Ryu非常简单，在linux命令行下输入</p>
-<pre><code>% pip <span class="keyword">install</span> ryu</code></pre>
-<p>pip是Python包管理工具，具体可见<a href="https://pypi.python.org/pypi/pip" title="pip" target="_blank"><a href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a></a></p>
-<p>如果你热衷于使用源码安装Ryu，可以使用Git下载源码，并安装</p>
-<pre><code>% git clone git://github<span class="preprocessor">.com</span>/osrg/ryu<span class="preprocessor">.git</span>
-% cd ryu<span class="comment">; python ./setup.py install</span></code></pre>
-<p>如果你想了解在Openstack中如何使用Ryu，请参见<a href="http://ryu.readthedocs.org/en/latest/using_with_openstack.html" target="_blank">详细文档</a>。你可以VLAN使用创建许多隔离的虚拟网络。 Ryu在Openstack的E版本中出现。<br>如果你系那个要编写你自己的Ryu的应用，可以参考<a href="http://ryu.readthedocs.org/en/latest/writing_ryu_app.html" target="_blank">Writing ryu application</a>文档。编写完成后，只需要简单的输入</p>
-<pre><code>% ryu-manager <span class="filename">yourapp.py</code></pre>
-<h2>1.3 Support</h2>
-<p>Ryu的官方网站是<a href="http://osrg.github.io/ryu/" target="_blank"><a href="http://osrg.github.io/ryu/">http://osrg.github.io/ryu/</a></a></p>
-<hr>
-<p>本系列文章翻译于Ryu Documentation Release 3.14，并加入自己的理解</p>
+        <h2>2.1 第一个Ryu应用</h2>
+<p>如果你想用自己的方式来管理网络设备，比如路由器、交换机等，你可以自己来编写一个Ryu的应用程序来实现你的想法。你的应用程序可以告诉Ryu来如何管理这些设备，然后Ryu通过OpenFlow协议来管理设备。编写Ryu应用程序非常简单，直接通过Python脚本就可以实现了。接下来我们就看看如果写一个简单的Ryu应用。<br><a id="more"></a></p>
+<h2>Dumb Switch</h2>
+<p>我们首先来实现一个简单的交换机，交换机将所有的收到的包在各个端口洪泛发送。代码如下</p>
+<pre><code>from ryu.base import app_manager
+from ryu.controller import ofp_event
+from ryu.controller.handler import MAIN_DISPATCHER
+from ryu.controller.handler import set_ev_cls
+<span class="class"><span class="keyword">class</span> <span class="title">L2Switch</span>(<span class="title">app_manager</span>.<span class="title">RyuApp</span>):
+    <span class="title">def</span> <span class="title">__init__</span>(<span class="title">self</span>, *<span class="title">args</span>, **<span class="title">kwargs</span>):
+        <span class="title">super</span>(<span class="title">L2Switch</span>, <span class="title">self</span>).<span class="title">__init__</span>(*<span class="title">args</span>, **<span class="title">kwargs</span>)
+    @<span class="title">set_ev_cls</span>(<span class="title">ofp_event</span>.<span class="title">EventOFPPacketIn</span>, <span class="title">MAIN_DISPATCHER</span>)
+    <span class="title">def</span> <span class="title">packet_in_handler</span>(<span class="title">self</span>, <span class="title">ev</span>):
+        <span class="title">msg</span> = <span class="title">ev</span>.<span class="title">msg</span>
+        <span class="title">dp</span> = <span class="title">msg</span>.<span class="title">datapath</span>
+        <span class="title">ofp</span> = <span class="title">dp</span>.<span class="title">ofproto</span>
+        <span class="title">ofp_parser</span> = <span class="title">dp</span>.<span class="title">ofproto_parser</span>
+
+        <span class="title">actions</span> = [<span class="title">ofp_parser</span>.<span class="title">OFPActionOutput</span>(<span class="title">ofp</span>.<span class="title">OFPP_FLOOD</span>)]
+        <span class="title">out</span> = <span class="title">ofp_parser</span>.<span class="title">OFPPacketOut</span>(
+        <span class="title">datapath</span>=<span class="title">dp</span>, <span class="title">buffer_id</span>=<span class="title">msg</span>.<span class="title">buffer_id</span>, <span class="title">in_port</span>=<span class="title">msg</span>.<span class="title">in_port</span>,
+        <span class="title">actions</span>=<span class="title">actions</span>)
+        <span class="title">dp</span>.<span class="title">send_msg</span>(<span class="title">out</span>)</code></pre>
+<p>接下来，我们分析一下这段代码。初始化函数，没有做实际的事情，不多说。我们来看一下packet_in_handler函数。每当Ryu收到OpenFlow协议中的packet_in消息时，这个函数就会被调用。原因一定是这个函数被注册为回调函数了。在这里的关键就是set_ev_cls装饰器。其实这个函数就是将packet_in_handler函数注册到packet_in消息上，每当有packet_in消息就调用该函数，使用装饰器使得代码显得比较简洁优美。我们来看一下这个装饰器的参数:</p>
+<ul>
+<li>第一个参数是指定触发函数被调用的事件，这里即Packet_in事件。</li>
+<li>第二个参数是指定交换机的状态。比如，当交换机处于与控制器协商（negotiation）阶段时,可能你想忽略此时的packet_in消息，那我们就可以使用MAIN_DISPATCHER作为参数来表明当协商完成后该函数才被调用。</li>
+</ul>
+<p>接下来我们来分析packet_in_handler的函数体：<br>ev.msg是packet_in的消息对象，存储着消息的数据部分<br>msg.dp代表发送该消息的交换机（datapath）<br>dp.ofproto是交换机和控制器协商好的OF协议<br>dp.ofproto_parser是OF协议的解释器，用于解析和封装符合OF协议的数据。<br>OFPActionOutput函数用来生成一个action，该action指定包输出的转发端口。在我们这个应用中，交换机将包发送没每一个端口，因此使用OFPP_FLOOD常量作为参数。<br>OFPPacketOut函数用来生成packet_out包<br>send_msg函数将包发送给相关的交换机</p>
+<p>到这儿，我们就完成了我们第一个Ryu应用程序。我们可以将其保存为l2.py文件，然后执行如下命令就启动我们的应用了。</p>
+<pre><code>% ryu-manager l2<span class="variable">.py</span>
+loading app l2<span class="variable">.py</span>
+instantiating app l2<span class="variable">.py</span></code></pre>
 
       
     </div>
