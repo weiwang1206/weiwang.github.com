@@ -96,13 +96,18 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
 <pre><code><span class="keyword">import</span> inspect
 
 <span class="class"><span class="keyword">class</span> <span class="title">C</span><span class="params">()</span>:</span>
+
+    <span class="class"><span class="keyword">class</span> <span class="title">CC</span><span class="params">()</span>:</span>
+        <span class="function"><span class="keyword">def</span> <span class="title">foo3</span><span class="params">()</span>:</span>
+        <span class="keyword">print</span> <span class="string">"foo3"</span>
+
     <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span>
         <span class="keyword">print</span> <span class="string">"foo"</span>
     <span class="function"><span class="keyword">def</span> <span class="title">foo2</span><span class="params">()</span>:</span>
         <span class="keyword">print</span> <span class="string">"foo2"</span>
 cls = inspect.getmembers(C,inspect.ismethod)
 <span class="keyword">print</span> cls</code></pre>
-<p>执行的结果是<br>[(‘foo’, <unbound method C.foo>), (‘foo2’, <unbound method C.foo2>)]</p>
+<p>执行的结果是<br><img src="/img/python-inspect-result.jpg" alt="phase"></p>
 
       
     </div>
