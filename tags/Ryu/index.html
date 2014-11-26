@@ -80,7 +80,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
       
   
-    <h1 class="title"><a href="/2014/11/24/RyuDoc4/">Ryu文档-2-2-Ryu组件</a></h1>
+    <h1 class="title"><a href="/2014/11/24/RyuDoc4/">Ryu文档-2-3-Ryu组件</a></h1>
   
 
     </header>
@@ -89,28 +89,15 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         <h1>2.3 Ryu应用的API</h1>
 <h2>2.3.1 Ryu应用的编程模型</h2>
 <p>ryu应用是单线程的实体，应用之间通过消息彼此通信。</p>
-<p>ryu应用之间互相发送异步的消息。ryu的OpenFlow控制器不属于ryu应用，但也是产生消息的源头。虽然ryu的消息可以包含任意的python objects，但是并不推荐在ryu应用之间传递较大的实体。</p>
-<p>每个ryu应用有一个消息的接收队列，是一个FIFO队列。每个ryu应用都有一个事件处理线程，该线程不断的从接收队列冲取出消息，并根据消息类型调用相应的消息处理函数。消息处理函数似乎在实现处理线程的上下文环境中被调用的，因此必须做好阻塞。</p>
-<p>ryu有很多类型的消息类型来实现ryu应用之间的异步消息。</p>
-<p>contexts是ryu应用公用的一个objects，因此不要用于新的代码中。<br>（意思contexts这个变量是内部变量？不要随便用？）</p>
-<h2>2.3.2 创建一个Ryu应用</h2>
-<p>一个ryu应用是作为一个python模块的，并且继承了ryu.base.app_manager.RyuApp类。如果两个相同的ryu应用被定义在一个模块中，那么app_manager将选择第一个出现的。ryu应用是单例的，只允许有一个给定的ryu应用。</p>
-<h2>2.3.3 如何获取ryu消息</h2>
-<p>ryu应用通过注册的方式与消息挂钩，通过ryu.controller.handler.set_ev_cls 装饰器来注册某一个时间的处理函数。该装饰器第一个参数定义注册的消息类型，第二个参数可以指定一个接收的时间阶段（如下图），来指定在什么时候才为这个处理函数生成消息。</p>
-<p><img src="/img/ryudoc4phase.jpg" alt="phase"></p>
-<h2>2.3.4 如何生成ryu消息</h2>
-<p>ryu应用可以使用send_event 或者 send_event_to_observers 函数发送消息</p>
-<h2>2.3.5 事件类</h2>
-<p>事件类描述了ryu系统中的事件。ryu中所有的事件类都已“Event”作为前缀。消息事件可以由ryu的核心组件生成，也可以有ryu应用生成。</p>
-<p>ryu.controller.ofp_event 模块定义了openflow消息的事件类。该类消息被规范的命名为ryu.controller.ofp_event.EventOFPxxxx。例如EventOFPPacketIn是OF的packet-in消息。OpenFlow控制器自通的解析Openflow消息并将消息时间发送给关心该消息类型的应用。</p>
-<h2>2.3.6 ryu.controller.controller.Datapath</h2>
-<p>该类定义了与控制器相连的交换机的信息，类中定义的属性如下。</p>
-<p><img src="/img/ryudoc4dp.jpg" alt="datapath"></p>
-
+<p>ryu应用之间互相发送异步的消息。ryu的OpenFlow控制器不属于ryu应用，但也是产生消息的源头。虽然ryu的消息可以包含任意的python objects，但是并不推荐在ryu应用之间传递较大的实体。<br>
       
     </div>
     <footer>
       
+        
+          <div class="alignleft">
+            <a href="/2014/11/24/RyuDoc4/#more" class="more-link">Read More</a>
+          </div>
         
         
       
@@ -261,6 +248,8 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   
     <li><a href="/categories/Photo/">Photo</a><small>2</small></li>
   
+    <li><a href="/categories/Python/">Python</a><small>2</small></li>
+  
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
     <li><a href="/categories/Ryu/">Ryu</a><small>4</small></li>
@@ -289,6 +278,8 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
   
     <li><a href="/tags/Photo/">Photo</a><small>1</small></li>
+  
+    <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
     <li><a href="/tags/Ryu/">Ryu</a><small>4</small></li>
   
