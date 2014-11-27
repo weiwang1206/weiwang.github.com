@@ -76,11 +76,11 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-11-24T14:26:53.000Z"><a href="/2014/11/24/RyuDoc4/">11月 24 2014</a></time>
+        <time datetime="2014-11-27T14:21:38.000Z"><a href="/2014/11/27/RyuDoc4/">11月 27 2014</a></time>
       
       
   
-    <h1 class="title"><a href="/2014/11/24/RyuDoc4/">Ryu文档-2-3-Ryu组件</a></h1>
+    <h1 class="title"><a href="/2014/11/27/RyuDoc4/">Ryu文档-2-3-Ryu组件</a></h1>
   
 
     </header>
@@ -96,7 +96,74 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
         
           <div class="alignleft">
-            <a href="/2014/11/24/RyuDoc4/#more" class="more-link">Read More</a>
+            <a href="/2014/11/27/RyuDoc4/#more" class="more-link">Read More</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+  
+    <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-27T14:21:10.000Z"><a href="/2014/11/27/ryu-source-analysis-1/">11月 27 2014</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2014/11/27/ryu-source-analysis-1/">Ryu代码解析（一）</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2>RYU main函数</h2>
+<p>Ryu的main函数位于cmd\manager.py文件中，main函数如下：</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(args=None, prog=None)</span>:</span>
+    <span class="keyword">try</span>:
+        CONF(args=args, prog=prog,
+             project=<span class="string">'ryu'</span>, version=<span class="string">'ryu-manager %s'</span> % version,
+             default_config_files=[<span class="string">'/usr/local/etc/ryu/ryu.conf'</span>])
+    <span class="keyword">except</span> cfg.ConfigFilesNotFoundError:
+        CONF(args=args, prog=prog,
+             project=<span class="string">'ryu'</span>, version=<span class="string">'ryu-manager %s'</span> % version)
+    log.init_log()
+    <span class="keyword">if</span> CONF.pid_file:
+        <span class="keyword">import</span> os
+        <span class="keyword">with</span> open(CONF.pid_file, <span class="string">'w'</span>) <span class="keyword">as</span> pid_file:
+            pid_file.write(str(os.getpid()))
+    app_lists = CONF.app_lists + CONF.app //从用户命令行获取的app列表
+    <span class="comment"># keep old behaivor, run ofp if no application is specified.</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> app_lists:
+        app_lists = [<span class="string">'ryu.controller.ofp_handler'</span>] //添加默认的应用
+    app_mgr = AppManager.get_instance() //获取appManager实例，是单体类
+    app_mgr.load_apps(app_lists) //加载所有app
+    contexts = app_mgr.create_contexts() //加载context
+    services = []
+    services.extend(app_mgr.instantiate_apps(**contexts)) //以context作为参数，实例化app
+    webapp = wsgi.start_service(app_mgr)
+    <span class="keyword">if</span> webapp:
+        thr = hub.spawn(webapp)
+        services.append(thr)
+    <span class="keyword">try</span>:
+        hub.joinall(services)
+    <span class="keyword">finally</span>:
+        app_mgr.close()</code></pre>
+<p>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2014/11/27/ryu-source-analysis-1/#more" class="more-link">Read More</a>
           </div>
         
         
@@ -506,7 +573,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>4</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>5</small></li>
   
   </ul>
 </div>
@@ -517,7 +584,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>10</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>11</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -535,7 +602,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>4</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>5</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   
