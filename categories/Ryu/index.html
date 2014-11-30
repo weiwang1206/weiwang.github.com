@@ -76,6 +76,65 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
+        <time datetime="2014-11-30T16:20:33.000Z"><a href="/2014/12/01/ryu-source-analysis-2md/">12月 1 2014</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2014/12/01/ryu-source-analysis-2md/">Ryu代码分析（二）</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2>Ryu事件处理函数的挂接方式分析</h2>
+<p>Ryu支持用户自定义事件处理函数，当该事件发生时，用户定义的处理函数会被自动的调用。那么这个机制具体是如何实现的呢？本篇博客就针对该问题，做一个简单的梳理，才疏学浅，欢迎指正！</p>
+<p>首先来看RYU文档中的那个第一个APP程序：</p>
+<pre><code>from ryu.base import app_manager
+from ryu.controller import ofp_event
+from ryu.controller.handler import MAIN_DISPATCHER
+from ryu.controller.handler import set_ev_cls
+
+<span class="class"><span class="keyword">class</span> <span class="title">L2Switch</span>(<span class="title">app_manager</span>.<span class="title">RyuApp</span>):
+    <span class="title">def</span> <span class="title">__init__</span>(<span class="title">self</span>, *<span class="title">args</span>, **<span class="title">kwargs</span>):
+        <span class="title">super</span>(<span class="title">L2Switch</span>, <span class="title">self</span>).<span class="title">__init__</span>(*<span class="title">args</span>, **<span class="title">kwargs</span>)
+
+    @<span class="title">set_ev_cls</span>(<span class="title">ofp_event</span>.<span class="title">EventOFPPacketIn</span>, <span class="title">MAIN_DISPATCHER</span>)
+    <span class="title">def</span> <span class="title">packet_in_handler</span>(<span class="title">self</span>, <span class="title">ev</span>):
+        <span class="title">msg</span> = <span class="title">ev</span>.<span class="title">msg</span>
+        <span class="title">dp</span> = <span class="title">msg</span>.<span class="title">datapath</span>
+        <span class="title">ofp</span> = <span class="title">dp</span>.<span class="title">ofproto</span>
+        <span class="title">ofp_parser</span> = <span class="title">dp</span>.<span class="title">ofproto_parser</span>
+
+        <span class="title">actions</span> = [<span class="title">ofp_parser</span>.<span class="title">OFPActionOutput</span>(<span class="title">ofp</span>.<span class="title">OFPP_FLOOD</span>)]
+        <span class="title">out</span> = <span class="title">ofp_parser</span>.<span class="title">OFPPacketOut</span>(
+        <span class="title">datapath</span>=<span class="title">dp</span>, <span class="title">buffer_id</span>=<span class="title">msg</span>.<span class="title">buffer_id</span>, <span class="title">in_port</span>=<span class="title">msg</span>.<span class="title">in_port</span>,
+        <span class="title">actions</span>=<span class="title">actions</span>)
+        <span class="title">dp</span>.<span class="title">send_msg</span>(<span class="title">out</span>)</code></pre>
+<p>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2014/12/01/ryu-source-analysis-2md/#more" class="more-link">Read More</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+  
+    <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2014-11-27T14:21:10.000Z"><a href="/2014/11/27/ryu-source-analysis-1/">11月 27 2014</a></time>
       
       
@@ -319,7 +378,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>5</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>6</small></li>
   
   </ul>
 </div>
@@ -330,7 +389,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>11</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>12</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -348,7 +407,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>5</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>6</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   

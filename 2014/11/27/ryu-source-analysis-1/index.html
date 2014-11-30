@@ -232,13 +232,14 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <span class="keyword">assert</span> app.name <span class="keyword">not</span> <span class="keyword">in</span> self.applications
     self.applications[app.name] = app //将app对象保存到applications字典中
     <span class="keyword">return</span> app</code></pre>
-<p>register_app函数中调用regester_instance函数（该函数在handler.py文件中）,在该函数中通过inspect.getmembers函数，获取app类中的方法，</p>
+<p>register_app函数中调用regester_instance函数（该函数在handler.py文件中）,在该函数中通过inspect.getmembers函数，获取app类中的方法，并通过app的register_handler将handler注册到app的event_handlers成员变量中</p>
 <pre><code><span class="function"><span class="keyword">def</span> <span class="title">register_instance</span><span class="params">(i)</span>:</span>
     <span class="keyword">for</span> _k, m <span class="keyword">in</span> inspect.getmembers(i, inspect.ismethod):
         <span class="comment"># LOG.debug('instance %s k %s m %s', i, _k, m)</span>
         <span class="keyword">if</span> _has_caller(m):
             <span class="keyword">for</span> ev_cls, c <span class="keyword">in</span> m.callers.iteritems():
                 i.register_handler(ev_cls, m)</code></pre>
+<p>到这儿可能还比较迷惑，handler是如何挂到每个事件上的，将在后面的一篇博客中专门介绍一下。</p>
 
       
     </div>
@@ -325,7 +326,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>5</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>6</small></li>
   
   </ul>
 </div>
@@ -336,7 +337,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>11</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>12</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -354,7 +355,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>5</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>6</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   
