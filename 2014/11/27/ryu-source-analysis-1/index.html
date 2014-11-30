@@ -215,6 +215,30 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         <span class="keyword">assert</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.contexts
         self.contexts[key] = context //加入contexts字典
     <span class="keyword">return</span> self.contexts //返回contexts字典</code></pre>
+<p>_instantiate函数：</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">_instantiate</span><span class="params">(self, app_name, cls, *args, **kwargs)</span>:</span>
+    <span class="comment"># for now, only single instance of a given module</span>
+    <span class="comment"># Do we need to support multiple instances?</span>
+    <span class="comment"># Yes, maybe for slicing.</span>
+    LOG.info(<span class="string">'instantiating app %s of %s'</span>, app_name, cls.__name__)
+
+    <span class="keyword">if</span> hasattr(cls, <span class="string">'OFP_VERSIONS'</span>) <span class="keyword">and</span> cls.OFP_VERSIONS <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span>:
+        ofproto_protocol.set_app_supported_versions(cls.OFP_VERSIONS)
+
+    <span class="keyword">if</span> app_name <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span>:
+        <span class="keyword">assert</span> app_name <span class="keyword">not</span> <span class="keyword">in</span> self.applications
+    app = cls(*args, **kwargs) //实例化app类，kwargs参数是context字典
+    register_app(app) //注册app对象，主要是通过inspect组件获取其中的handler，详见下文
+    <span class="keyword">assert</span> app.name <span class="keyword">not</span> <span class="keyword">in</span> self.applications
+    self.applications[app.name] = app //将app对象保存到applications字典中
+    <span class="keyword">return</span> app</code></pre>
+<p>register_app函数中调用regester_instance函数（该函数在handler.py文件中）,在该函数中通过inspect.getmembers函数，获取app类中的方法，</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">register_instance</span><span class="params">(i)</span>:</span>
+    <span class="keyword">for</span> _k, m <span class="keyword">in</span> inspect.getmembers(i, inspect.ismethod):
+        <span class="comment"># LOG.debug('instance %s k %s m %s', i, _k, m)</span>
+        <span class="keyword">if</span> _has_caller(m):
+            <span class="keyword">for</span> ev_cls, c <span class="keyword">in</span> m.callers.iteritems():
+                i.register_handler(ev_cls, m)</code></pre>
 
       
     </div>
