@@ -239,7 +239,21 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         <span class="keyword">if</span> _has_caller(m):
             <span class="keyword">for</span> ev_cls, c <span class="keyword">in</span> m.callers.iteritems():
                 i.register_handler(ev_cls, m)</code></pre>
-<p>到这儿可能还比较迷惑，handler是如何挂到每个事件上的，将在后面的一篇博客中专门介绍一下。</p>
+<p>到这儿可能还比较迷惑，handler是如何挂到每个事件上的，将在后面的<a href="http://geekwei.com/2014/12/01/ryu-source-analysis-2md/" target="_blank">Ryu事件处理函数的挂接方式分析</a>中专门介绍一下。</p>
+<p>instantiate_apps函数：实例化app，并且启动每个app</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">instantiate_apps</span><span class="params">(self, *args, **kwargs)</span>:</span>
+    <span class="keyword">for</span> app_name, cls <span class="keyword">in</span> self.applications_cls.items():
+        self._instantiate(app_name, cls, *args, **kwargs)
+
+    self._update_bricks() //将app更新到全局变量SERVICE_BRICK中
+    self.report_bricks()
+
+    threads = []
+    <span class="keyword">for</span> app <span class="keyword">in</span> self.applications.values():
+        t = app.start() //启动APP
+        <span class="keyword">if</span> t <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span>:
+            threads.append(t)
+    <span class="keyword">return</span> threads</code></pre>
 
       
     </div>
@@ -326,7 +340,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>6</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>7</small></li>
   
   </ul>
 </div>
@@ -337,7 +351,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>12</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>13</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -355,7 +369,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>6</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>7</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   

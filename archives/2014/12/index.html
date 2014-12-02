@@ -76,11 +76,104 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
+        <time datetime="2014-12-02T13:35:13.000Z"><a href="/2014/12/02/ryu-source-analysis-3/">12月 2 2014</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2014/12/02/ryu-source-analysis-3/">Ryu代码解析（二）</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2>RyuApp基类</h2>
+<p>_CONTEXTS<br>该变量是RyuApp基类中定义的上下文字典，app子类来填充这个变量。该变量用来说明子类想要使用的上下文模块。但是这个上下文模块的初始化是由AppManager来做的，而且相同的上下文模块对象在不同的app子类之间是共享的。例如：</p>
+<pre><code> _CONTEXTS = {
+        <span class="string">'network'</span>: network.Network
+    }
+
+    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, *kwargs)</span>:</span>
+        // 这里的kwargs就是传进来的共享的上下文，然后获取其中的‘network’来初始化每个子类中的关心的上下文变量
+        self.network = kwargs[<span class="string">'network'</span>] </code></pre>
+<p>_EVENTS</p>
+<p>A list of event classes which this RyuApp subclass would generate.This should be specified if and only if event classes are defined in a different python module from the RyuApp subclass is.</p>
+<p>暂时不太懂怎么用，请懂的朋友留言指点。</p>
+<p><strong>init函数</strong>：初始化成员变量</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *_args, **_kwargs)</span>:</span>
+    super(RyuApp, self).__init__()
+    self.name = self.__class__.__name__
+    self.event_handlers = {}        <span class="comment"># ev_cls -&gt; handlers:list 事件处理函数字典key是事件，value是处理函数</span>
+    self.observers = {}     <span class="comment"># ev_cls -&gt; observer-name -&gt; states:set key是消息类，value是关注该消息的app</span>
+    self.threads = [] <span class="comment">#线程句柄</span>
+    self.events = hub.Queue(<span class="number">128</span>)
+    <span class="keyword">if</span> hasattr(self.__class__, <span class="string">'LOGGER_NAME'</span>):
+        self.logger = logging.getLogger(self.__class__.LOGGER_NAME)
+    <span class="keyword">else</span>:
+        self.logger = logging.getLogger(self.name)
+    self.CONF = cfg.CONF
+
+    <span class="comment"># prevent accidental creation of instances of this class outside RyuApp</span>
+    <span class="class"><span class="keyword">class</span> <span class="title">_EventThreadStop</span><span class="params">(event.EventBase)</span>:</span>
+        <span class="keyword">pass</span>
+    self._event_stop = _EventThreadStop()
+    self.is_active = <span class="built_in">True</span> <span class="comment">#激活</span></code></pre>
+<p><strong>start函数</strong>：启动该app，新建一个线程，线程执行_event_loop函数</p>
+<pre><code> <span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(self)</span>:</span>
+    <span class="string">"""
+    Hook that is called after startup initialization is done.
+    """</span>
+    self.threads.append(hub.spawn(self._event_loop))</code></pre>
+<p><strong>_event_loop函数</strong>： app主线程执行的函数，从消息队列event中取出事件，并根据事件类型调用不同的处理函数</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">_event_loop</span><span class="params">(self)</span>:</span>
+    <span class="keyword">while</span> self.is_active <span class="keyword">or</span> <span class="keyword">not</span> self.events.empty():
+        ev, state = self.events.get()
+        <span class="keyword">if</span> ev == self._event_stop:
+            <span class="keyword">continue</span>
+        handlers = self.get_handlers(ev, state) <span class="comment">#从event_handlers成员变量中获得key是ev类型的处理函数，而且处理函数的_dispatcher要符合当前的state才会返回该handler。</span>
+        <span class="keyword">for</span> handler <span class="keyword">in</span> handlers:
+            handler(ev)</code></pre>
+<p><strong>stop函数</strong>：停止app主线程</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">stop</span><span class="params">(self)</span>:</span>
+    self.is_active = <span class="built_in">False</span>
+    self._send_event(self._event_stop, <span class="built_in">None</span>)
+    hub.joinall(self.threads)</code></pre>
+<p>register_handler:注册处理函数,保存在event_handlers变量中，key是事件类，value是一个list，保存关注该事件的处理函数，关注同一个事件的处理函数可能有多个所以保存在list中。</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">register_handler</span><span class="params">(self, ev_cls, handler)</span>:</span>
+    <span class="keyword">assert</span> callable(handler)
+    self.event_handlers.setdefault(ev_cls, [])
+    self.event_handlers[ev_cls].append(handler)</code></pre>
+<p>unregister_handler: 注销处理函数，具体操作为从event_handlers中删除该handler</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">unregister_handler</span><span class="params">(self, ev_cls, handler)</span>:</span>
+    <span class="keyword">assert</span> callable(handler)
+    self.event_handlers[ev_cls].remove(handler)
+    <span class="keyword">if</span> <span class="keyword">not</span> self.event_handlers[ev_cls]:
+        <span class="keyword">del</span> self.event_handlers[ev_cls]</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+  
+    <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2014-11-30T16:20:33.000Z"><a href="/2014/12/01/ryu-source-analysis-2md/">12月 1 2014</a></time>
       
       
   
-    <h1 class="title"><a href="/2014/12/01/ryu-source-analysis-2md/">Ryu代码分析（二）</a></h1>
+    <h1 class="title"><a href="/2014/12/01/ryu-source-analysis-2md/">Ryu代码解析（二）</a></h1>
   
 
     </header>
@@ -163,7 +256,7 @@ from ryu.controller.handler import set_ev_cls
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>6</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>7</small></li>
   
   </ul>
 </div>
@@ -174,7 +267,7 @@ from ryu.controller.handler import set_ev_cls
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>12</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>13</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -192,7 +285,7 @@ from ryu.controller.handler import set_ev_cls
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>6</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>7</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   
