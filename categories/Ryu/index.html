@@ -76,6 +76,48 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <header>
       
         <div class="icon"></div>
+        <time datetime="2014-12-04T11:38:14.000Z"><a href="/2014/12/04/ryu-source-analysis-4/">12月 4 2014</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2014/12/04/ryu-source-analysis-4/">Ryu代码解析（四）</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2>Ryu OFPHandler类</h2>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">OFPHandler</span><span class="params">(ryu.base.app_manager.RyuApp)</span>:</span></code></pre>
+<p>OFPHandler类也是RyuApp的子类，但它是一个特殊的app，负责处理OF协议的相关的事件，同时将事件发送给不同的app。</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span>
+    super(OFPHandler, self).__init__(*args, **kwargs)
+    //这里将OFPHandler类的名字定义为ofp_event，后面会用到
+    self.name = <span class="string">'ofp_event'</span> </code></pre>
+<p>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2014/12/04/ryu-source-analysis-4/#more" class="more-link">Read More</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+  
+    <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2014-12-02T13:35:13.000Z"><a href="/2014/12/02/ryu-source-analysis-3/">12月 2 2014</a></time>
       
       
@@ -423,7 +465,7 @@ from ryu.controller.handler import set_ev_cls
   
     <li><a href="/categories/Research/">Research</a><small>1</small></li>
   
-    <li><a href="/categories/Ryu/">Ryu</a><small>7</small></li>
+    <li><a href="/categories/Ryu/">Ryu</a><small>8</small></li>
   
   </ul>
 </div>
@@ -434,7 +476,7 @@ from ryu.controller.handler import set_ev_cls
   <h3 class="title">标签</h3>
   <ul class="entry">
   
-    <li><a href="/tags/Controller/">Controller</a><small>13</small></li>
+    <li><a href="/tags/Controller/">Controller</a><small>14</small></li>
   
     <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
   
@@ -452,7 +494,7 @@ from ryu.controller.handler import set_ev_cls
   
     <li><a href="/tags/Python/">Python</a><small>2</small></li>
   
-    <li><a href="/tags/Ryu/">Ryu</a><small>7</small></li>
+    <li><a href="/tags/Ryu/">Ryu</a><small>8</small></li>
   
     <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
   
