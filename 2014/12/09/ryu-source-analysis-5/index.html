@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Ryu代码解析（五） | Wei's Blog</title>
+  <meta name="author" content="Wei Wang">
+  
+  <meta name="description" content="OpenFlowController类
+该类位于ryu\controller\controller.py
+OpenFlowController类非常简单，它其实是作为OFPHandler类的一个线程存在的，而不是一个独立app。该类也没有OF协议相关的处理函数，那这个类究竟做什么呢？其实他的工作很简单，就是在著名的6633端口监听来自交换机的连接，并且建立与交换机之间的连接，并且在控制层面创建于其对应的dp类，连接建立后其余的工作就交给OFPHander类处理交换机发来的包了（从Hello包开始）。我们来详细看一下这个类的组成。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Ryu代码解析（五）"/>
+  <meta property="og:site_name" content="Wei's Blog"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Wei's Blog" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fee42232f9a9cfb4d15d91b1d836dbc7e' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'true']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">Wei's Blog</a></h1>
+  <h2><a href="/">Build my new life</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-12-09T13:17:36.000Z"><a href="/2014/12/09/ryu-source-analysis-5/">12月 9 2014</a></time>
+      
+      
+  
+    <h1 class="title">Ryu代码解析（五）</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2>OpenFlowController类</h2>
+<p>该类位于ryu\controller\controller.py</p>
+<p>OpenFlowController类非常简单，它其实是作为OFPHandler类的一个线程存在的，而不是一个独立app。该类也没有OF协议相关的处理函数，那这个类究竟做什么呢？其实他的工作很简单，就是在著名的6633端口监听来自交换机的连接，并且建立与交换机之间的连接，并且在控制层面创建于其对应的dp类，连接建立后其余的工作就交给OFPHander类处理交换机发来的包了（从Hello包开始）。我们来详细看一下这个类的组成。<br><a id="more"></a><br><strong>call</strong>函数：这个函数是python的内置函数，该函数在类对象初始化时被自动的调用，从<a href="http://geekwei.com/2014/12/04/ryu-source-analysis-4/" target="_blank">上一篇博客中</a>我们知道，OFPHandle在start函数中新建了OpenFlowController对象，此时就调用了<strong>call</strong>函数，该函数中调用server_loop函数。</p>
+<pre><code> <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self)</span>:</span>
+    <span class="comment"># LOG.debug('call')</span>
+    self.server_loop()</code></pre>
+<p>server_loop函数：该函数新建一个监听server，然后开始监听，就这么简单。只不过ryu使用了一个叫做<a href="http://www.gevent.org/" target="_blank">Gevent</a>的轻量级高并发框架。博主不太了解该框架。我们只关注其功能，可以看到在函数中第一步就是新建一个StreamServer，在其参数中我们只关注datapath_connection_factory这个参数，其实他是一个函数句柄，当一个server成功接收一个来自交换机的连接时就调用该函数，后面会讲该函数。新建server之后，调用serve_forever，从函数名可知就是启动服务器开始服务。</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">server_loop</span><span class="params">(self)</span>:</span>
+    <span class="keyword">if</span> CONF.ctl_privkey <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span> <span class="keyword">and</span> CONF.ctl_cert <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span>:
+        <span class="keyword">if</span> CONF.ca_certs <span class="keyword">is</span> <span class="keyword">not</span> <span class="built_in">None</span>:
+            server = StreamServer((CONF.ofp_listen_host,
+                                   CONF.ofp_ssl_listen_port),
+                                  datapath_connection_factory,
+                                  keyfile=CONF.ctl_privkey,
+                                  certfile=CONF.ctl_cert,
+                                  cert_reqs=ssl.CERT_REQUIRED,
+                                  ca_certs=CONF.ca_certs,
+                                  ssl_version=ssl.PROTOCOL_TLSv1)
+        <span class="keyword">else</span>:
+            server = StreamServer((CONF.ofp_listen_host,
+                                   CONF.ofp_ssl_listen_port),
+                                  datapath_connection_factory,
+                                  keyfile=CONF.ctl_privkey,
+                                  certfile=CONF.ctl_cert,
+                                  ssl_version=ssl.PROTOCOL_TLSv1)
+    <span class="keyword">else</span>:
+        server = StreamServer((CONF.ofp_listen_host,
+                               CONF.ofp_tcp_listen_port),
+                              datapath_connection_factory)
+
+    <span class="comment"># LOG.debug('loop')</span>
+    server.serve_forever()</code></pre>
+<p>OpenFlowController类就以上两个主要的函数，功能就是启动监听。</p>
+<p>接下来我们看一下上面提到的当成功建立与一台交换机的连接之后调用的函数。</p>
+<p>datapath_connection_factory函数： 该函数的参数是socket和address，是由streamserver建立与交换机连接之后传入的交换机的socket和address。然后就是一个麻烦的python特有语法 with … as …，是try…final的简易写法。在这里的流程是就是新建一个datapath(socket,address)，赋值给datapath，然后如果创建成功就执性try中的语句，如果创建都没成功就关闭它。执行try中的语句时，如果try中的语句出错就执行except中的语句，最后再执行contextlib.closing函数关闭新建的datapath。我们假设创建datapath是成功的，那么就执行datapath的serve函数，有关datapath类的详细信息后面会介绍。可见当OpenFlowController的server每当成功连接一个交换机后，就会创建一个于其对应的datapath，以后与交换机的通信就通过该datapath。</p>
+<pre><code><span class="function"><span class="keyword">def</span> <span class="title">datapath_connection_factory</span><span class="params">(socket, address)</span>:</span>
+    LOG.debug(<span class="string">'connected socket:%s address:%s'</span>, socket, address)
+    <span class="keyword">with</span> contextlib.closing(Datapath(socket, address)) <span class="keyword">as</span> datapath:
+        <span class="keyword">try</span>:
+            datapath.serve()
+        <span class="keyword">except</span>:
+            <span class="comment"># Something went wrong.</span>
+            <span class="comment"># Especially malicious switch can send malformed packet,</span>
+            <span class="comment"># the parser raise exception.</span>
+            <span class="comment"># Can we do anything more graceful?</span>
+            <span class="keyword">if</span> datapath.id <span class="keyword">is</span> <span class="built_in">None</span>:
+                dpid_str = <span class="string">"%s"</span> % datapath.id
+            <span class="keyword">else</span>:
+                dpid_str = dpid_to_str(datapath.id)
+            LOG.error(<span class="string">"Error in the datapath %s from %s"</span>, dpid_str, address)
+            <span class="keyword">raise</span></code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Ryu/">Ryu</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Ryu/">Ryu</a>, <a href="/tags/Controller/">Controller</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"weiwang1206"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+</section>
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:weiwang1206.github.io/">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/categories/Network/">Network</a><small>2</small></li>
+  
+    <li><a href="/categories/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/categories/Others/">Others</a><small>1</small></li>
+  
+    <li><a href="/categories/Photo/">Photo</a><small>2</small></li>
+  
+    <li><a href="/categories/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/categories/Research/">Research</a><small>1</small></li>
+  
+    <li><a href="/categories/Ryu/">Ryu</a><small>9</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Controller/">Controller</a><small>15</small></li>
+  
+    <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
+  
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
+  
+    <li><a href="/tags/Hexo/">Hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/Network/">Network</a><small>4</small></li>
+  
+    <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/tags/Photo/">Photo</a><small>1</small></li>
+  
+    <li><a href="/tags/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/tags/Ryu/">Ryu</a><small>9</small></li>
+  
+    <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
+  
+    <li><a href="/tags/github/">github</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 Wei Wang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
