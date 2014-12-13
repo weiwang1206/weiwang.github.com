@@ -112,7 +112,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
             handler.callers[e] = _Caller(_listify(dispatchers), <span class="built_in">None</span>) <span class="comment">#只有这一行不同</span>
         <span class="keyword">return</span> handler
 <span class="keyword">return</span> _set_ev_cls_dec</code></pre>
-<p><strong>hello_handler</strong>函数：计算出switch和controller都支持的最大的OF版本，并且发送features_request请求（来获取交换机的基本性能，详细结构如下图），同时将该交换机的datapath的state设置为（CONFIG_DISPATCHER）。datapath为交换机在控制器中的一个对象，负责记录交换机的属性以及与交换机通信（接受，发送消息），详见<a href="http://aa" target="_blank">Ryu代码解析（五）</a></p>
+<p><strong>hello_handler</strong>函数：计算出switch和controller都支持的最大的OF版本，并且发送features_request请求（来获取交换机的基本性能，详细结构如下图），同时将该交换机的datapath的state设置为（CONFIG_DISPATCHER）。datapath为交换机在控制器中的一个对象，负责记录交换机的属性以及与交换机通信（接受，发送消息），详见<a href="http://geekwei.com/2014/12/09/ryu-source-analysis-5/" target="_blank">Ryu代码解析（五）</a></p>
 <pre><code><span class="title">def</span> hello_handler(self, ev):
     self.logger.debug('hello ev %s', ev)
     msg = ev.msg
@@ -144,7 +144,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     self.logger.debug('move onto config mode')
     //设置交换机 <span class="typedef">datapath的状态</span>
     <span class="typedef">datapath.set_state<span class="container">(<span class="type">CONFIG_DISPATCHER</span>)</span></span></code></pre>
-<p><img src="ryu-source-analysis-4-features.jpg" alt="Features_Reauest"></p>
+<p><img src="/img/ryu-source-analysis-4-features.jpg" alt="Features_Reauest"></p>
 <p><strong>switch_features_handler</strong>函数：features回复消息的处理函数，但是没看到保存收到的features信息，只保存了datapath的id。然后发送switch config消息。</p>
 <pre><code> def switch_features_handler(self, ev):
     msg = ev.msg
