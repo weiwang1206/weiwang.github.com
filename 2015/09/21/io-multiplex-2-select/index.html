@@ -4,19 +4,23 @@
   <meta charset="utf-8">
   
   
-  <title>IO-Multiplex-1 | Wei's Blog</title>
+  <title>IO多路复用 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="select
+  <meta name="description" content="selectdate:tags:- Linux- Networkcategories: Linux
 select是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。
 //linux system
 #include&lt;sys/select.h&gt;
-int select(int">
+int select(int maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout)
+struct timeval{
+    long tv_sec; /second
+    long tv_usec;/micro seconds
+}">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="IO-Multiplex-1"/>
+  <meta property="og:title" content="IO多路复用"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -81,13 +85,13 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
       
   
-    <h1 class="title">IO-Multiplex-1</h1>
+    <h1 class="title">IO多路复用</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>select</p>
+        <p>select<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
 <p><strong>select</strong>是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。</p>
 <pre><code><span class="comment">//linux system</span>
 <span class="preprocessor">#include&lt;sys/select.h&gt;</span>
@@ -96,7 +100,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <span class="keyword">long</span> tv_sec; /second
     <span class="keyword">long</span> tv_usec;/micro seconds
 }</code></pre>
-<p>以及配套使用的宏</p>
+<p><a id="more"></a><br>以及配套使用的宏</p>
 <pre><code>#include&lt;sys/<span class="operator"><span class="keyword">select</span>.h&gt;
 <span class="keyword">int</span> FD_ISSET(<span class="keyword">int</span> fd, fd_set * fdset)
 <span class="keyword">int</span> FD_CLR(<span class="keyword">int</span> fd, fd_set * fdset)
@@ -158,17 +162,7 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
     <footer>
       
         
-  
-  <div class="categories">
-    <a href="/categories/Linux/">Linux</a>
-  </div>
-
         
-  
-  <div class="tags">
-    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Network/">Network</a>
-  </div>
-
         
   <div class="addthis addthis_toolbox addthis_default_style">
     
@@ -226,7 +220,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
   
-    <li><a href="/categories/Linux/">Linux</a><small>3</small></li>
+    <li><a href="/categories/Linux/">Linux</a><small>1</small></li>
   
     <li><a href="/categories/Network/">Network</a><small>2</small></li>
   
@@ -261,9 +255,9 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/tags/Hexo/">Hexo</a><small>1</small></li>
   
-    <li><a href="/tags/Linux/">Linux</a><small>3</small></li>
+    <li><a href="/tags/Linux/">Linux</a><small>1</small></li>
   
-    <li><a href="/tags/Network/">Network</a><small>7</small></li>
+    <li><a href="/tags/Network/">Network</a><small>5</small></li>
   
     <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
   

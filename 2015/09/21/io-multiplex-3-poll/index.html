@@ -4,18 +4,16 @@
   <meta charset="utf-8">
   
   
-  <title>IO-Multiplex-2 | Wei's Blog</title>
+  <title>IO多路复用 | Wei's Blog</title>
   <meta name="author" content="Wei Wang">
   
-  <meta name="description" content="poll
-poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。
-#include &lt;poll.h&gt;
-int poll (struct pollfd *__fds, nfds_t __">
+  <meta name="description" content="polldate:tags:- Linux- Networkcategories: Linux
+poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="IO-Multiplex-2"/>
+  <meta property="og:title" content="IO多路复用"/>
   <meta property="og:site_name" content="Wei's Blog"/>
 
   
@@ -80,14 +78,16 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
       
   
-    <h1 class="title">IO-Multiplex-2</h1>
+    <h1 class="title">IO多路复用</h1>
   
 
     </header>
     <div class="entry">
       
-        <p>poll</p>
+        <p>poll<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
 <p>poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。</p>
+<a id="more"></a>
+
 <pre><code><span class="preprocessor">#include &lt;poll.h&gt;</span>
 <span class="keyword">int</span> poll (<span class="keyword">struct</span> pollfd *__fds, nfds_t __nfds, <span class="keyword">int</span> __timeout);
 <span class="keyword">struct</span> pollfd{
@@ -176,17 +176,7 @@ POLLNVAL    描述字不是一个打开的文件 *</code></pre>
     <footer>
       
         
-  
-  <div class="categories">
-    <a href="/categories/Linux/">Linux</a>
-  </div>
-
         
-  
-  <div class="tags">
-    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Network/">Network</a>
-  </div>
-
         
   <div class="addthis addthis_toolbox addthis_default_style">
     
@@ -244,7 +234,7 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
   
-    <li><a href="/categories/Linux/">Linux</a><small>3</small></li>
+    <li><a href="/categories/Linux/">Linux</a><small>1</small></li>
   
     <li><a href="/categories/Network/">Network</a><small>2</small></li>
   
@@ -279,9 +269,9 @@ var duoshuoQuery = {short_name:"weiwang1206"};
   
     <li><a href="/tags/Hexo/">Hexo</a><small>1</small></li>
   
-    <li><a href="/tags/Linux/">Linux</a><small>3</small></li>
+    <li><a href="/tags/Linux/">Linux</a><small>1</small></li>
   
-    <li><a href="/tags/Network/">Network</a><small>7</small></li>
+    <li><a href="/tags/Network/">Network</a><small>5</small></li>
   
     <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
   
