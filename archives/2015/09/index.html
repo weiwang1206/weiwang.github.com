@@ -80,13 +80,13 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
       
       
   
-    <h1 class="title"><a href="/2015/09/21/io-multiplex-3-poll/">IO多路复用</a></h1>
+    <h1 class="title"><a href="/2015/09/21/io-multiplex-3-poll/"></a></h1>
   
 
     </header>
     <div class="entry">
       
-        <p>poll<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
+        <p>title: IO多路复用 poll<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
 <p>poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。</p>
 
       
@@ -96,6 +96,50 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         
           <div class="alignleft">
             <a href="/2015/09/21/io-multiplex-3-poll/#more" class="more-link">Read More</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+  
+    <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-09-21T09:13:04.000Z"><a href="/2015/09/21/io-multiplex-2-select/">9月 21 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/09/21/io-multiplex-2-select/"></a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>title: IO多路复用 select<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
+<p><strong>select</strong>是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。</p>
+<pre><code><span class="comment">//linux system</span>
+<span class="preprocessor">#include&lt;sys/select.h&gt;</span>
+<span class="keyword">int</span> <span class="keyword">select</span>(<span class="keyword">int</span> maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,<span class="keyword">struct</span> timeval *timeout)
+<span class="keyword">struct</span> timeval{
+    <span class="keyword">long</span> tv_sec; /second
+    <span class="keyword">long</span> tv_usec;/micro seconds
+}</code></pre>
+<p>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/09/21/io-multiplex-2-select/#more" class="more-link">Read More</a>
           </div>
         
         
@@ -132,50 +176,6 @@ document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3
         
           <div class="alignleft">
             <a href="/2015/09/21/io-multiplex-1/#more" class="more-link">Read More</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-  
-    <article class="post">
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2015-09-21T09:13:04.000Z"><a href="/2015/09/21/io-multiplex-2-select/">9月 21 2015</a></time>
-      
-      
-  
-    <h1 class="title"><a href="/2015/09/21/io-multiplex-2-select/">IO多路复用</a></h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <p>select<br>date:<br>tags:<br>- Linux<br>- Network<br>categories: Linux</p>
-<p><strong>select</strong>是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。</p>
-<pre><code><span class="comment">//linux system</span>
-<span class="preprocessor">#include&lt;sys/select.h&gt;</span>
-<span class="keyword">int</span> <span class="keyword">select</span>(<span class="keyword">int</span> maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,<span class="keyword">struct</span> timeval *timeout)
-<span class="keyword">struct</span> timeval{
-    <span class="keyword">long</span> tv_sec; /second
-    <span class="keyword">long</span> tv_usec;/micro seconds
-}</code></pre>
-<p>
-      
-    </div>
-    <footer>
-      
-        
-          <div class="alignleft">
-            <a href="/2015/09/21/io-multiplex-2-select/#more" class="more-link">Read More</a>
           </div>
         
         
