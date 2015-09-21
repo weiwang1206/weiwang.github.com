@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>IO-Multiplex-2 | Wei's Blog</title>
+  <meta name="author" content="Wei Wang">
+  
+  <meta name="description" content="poll
+poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。
+#include &lt;poll.h&gt;
+int poll (struct pollfd *__fds, nfds_t __">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="IO-Multiplex-2"/>
+  <meta property="og:site_name" content="Wei's Blog"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Wei's Blog" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fee42232f9a9cfb4d15d91b1d836dbc7e' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'true']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">Wei's Blog</a></h1>
+  <h2><a href="/">Build my new life</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-09-21T09:13:04.000Z"><a href="/2015/09/21/io-multiplex-3-poll/">9月 21 2015</a></time>
+      
+      
+  
+    <h1 class="title">IO-Multiplex-2</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>poll</p>
+<p>poll函数和select函数非常类似，内核实现也是一样的。区别就是函数调用接口不同，并且poll没有了select对于描述符数量（最大1024）大小的限制。</p>
+<pre><code><span class="preprocessor">#include &lt;poll.h&gt;</span>
+<span class="keyword">int</span> poll (<span class="keyword">struct</span> pollfd *__fds, nfds_t __nfds, <span class="keyword">int</span> __timeout);
+<span class="keyword">struct</span> pollfd{
+    <span class="keyword">int</span> fd;              <span class="comment">//文件描述符</span>
+    <span class="keyword">short</span> events;    <span class="comment">//请求的事件</span>
+    <span class="keyword">short</span> revents;   <span class="comment">//返回的事件</span>
+};
+<span class="comment">//events, 后面带*号的只能作为描述字的返回结果存储在revents中，而不能作为测试条件用于events中    POLLIN        普通或优先级带数据可读</span>
+POLLRDNORM    普通数据可读
+POLLRDBAND    优先级带数据可读
+POLLPRI        高优先级数据可读
+POLLOUT        普通数据可写
+POLLWRNORM    普通数据可写
+POLLWRBAND    优先级带数据可写
+POLLERR        发生错误 *
+POLLHUP        发生挂起 *
+POLLNVAL    描述字不是一个打开的文件 *</code></pre>
+<p>__nfds表示 __fds的数量，timeout为超时，-1表示永远等待，0表示不等待，&gt;0表示等待的毫秒数。使用方法如下：</p>
+<pre><code>int main (int argc, char **argv)
+{                               
+    int sfd1, sfd2, sfd3<span class="comment">;   </span>
+
+    struct pollfd Events [<span class="number">3</span>]<span class="comment">;</span>
+    int retval<span class="comment">;              </span>
+    char buff [<span class="number">256</span>]<span class="comment">;         </span>
+    int readcnt<span class="comment">;             </span>
+
+    sfd1 = open (...)<span class="comment">;</span>
+    sfd2 = open (...)<span class="comment">;</span>
+    sfd3 = open (...)<span class="comment">;</span>
+
+
+
+    memset (Event, <span class="number">0</span>, sizeof(Events))<span class="comment">;</span>
+
+    Event[<span class="number">0</span>]<span class="preprocessor">.fd</span> = sfd1<span class="comment">;</span>
+    Event[<span class="number">0</span>]<span class="preprocessor">.events</span> = POLLIN | POLLERR<span class="comment">;     /*关心读取和出错事件*/</span>
+
+    Event[<span class="number">1</span>]<span class="preprocessor">.fd</span> = sfd2<span class="comment">;</span>
+    Event[<span class="number">1</span>]<span class="preprocessor">.events</span> = POLLIN | POLLERR<span class="comment">;     /*关心读取和出错事件*/</span>
+
+    Event[<span class="number">2</span>]<span class="preprocessor">.fd</span> = sfd3<span class="comment">;</span>
+    Event[<span class="number">2</span>]<span class="preprocessor">.events</span> = POLLIN | POLLERR<span class="comment">;     /*关心读取和出错事件*/</span>
+
+    while (<span class="number">1</span>) {
+            <span class="comment">/*等待事件*/</span>
+            retval = poll ((struct pollfd *)&amp;Events, <span class="number">3</span>, <span class="number">5000</span>)<span class="comment">;</span>
+            if (retval &lt; <span class="number">0</span>) {                                 
+                    perror (<span class="string">"poll"</span>)<span class="comment">;</span>
+                    exit (EXIT_FAILURE)<span class="comment">;</span>
+            }
+            if (retval == <span class="number">0</span>) {
+                    prinntf (<span class="string">"no data in 5 seconds.\n"</span>)<span class="comment">;</span>
+                    continue<span class="comment">;</span>
+            }
+
+            for (i = <span class="number">0</span><span class="comment">; i &lt; 3; i++) {</span>
+                    <span class="comment">/*检查错误*/</span>
+                    if (Events[i]<span class="preprocessor">.revents</span> &amp; POLLERR) {
+                            printf (<span class="string">"device error!\n"</span>)<span class="comment">;</span>
+                            exit (EXIT_FAILURE)<span class="comment">;</span>
+                    }
+
+                    <span class="comment">/*检查是否存在传递的数据(可读)*/</span>
+                    if (Events[i]<span class="preprocessor">.revents</span> &amp; POLLIN) {
+                            readcnt = read (Events[i]<span class="preprocessor">.fd</span>, buff, <span class="number">256</span>)<span class="comment">;</span>
+                            write (Events[i]<span class="preprocessor">.fd</span>, buff, readcnt)<span class="comment">;</span>
+                    }
+            }
+    }
+
+    close (sfd1)<span class="comment">;</span>
+    close (sfd2)<span class="comment">;</span>
+    colse (sfd3)<span class="comment">;</span>
+}</code></pre>
+<p>可以看到poll和select的程序模型基本是一样的。唯一区别就是传入关心的描述符集和传出事件的方式不一样。而且poll不需要在循环中每次都重新设置events，但是只是不需要在用户程序中重复设置，仍然需要每次都传入。</p>
+<h4>poll的缺陷</h4>
+<ul>
+<li>和select相同，用户态和内核态之间传输描述符集合及其事件的开销太大。</li>
+<li>返回的事件并不是只是有事件的描述符，而是所有描述符集合，需要进行遍历查找。</li>
+</ul>
+<p><strong>至此，经典的IO复用函数select和poll就简单介绍完了。在2000年左右，随着互联网的蓬勃发展，Client数目爆发式增长，服务器需要并发的数量已经不是几百几千这个数量级了，因此提出了<a href="http://http://www.kegel.com/c10k.html" target="_blank">C10K Problem</a>，指出select和poll已经不能胜任当前的服务器并发了，随后也提出了新的性能更好的IO复用函数，即Linux平台上的epoll，和FreeBSD平台的kqueue。</strong></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Linux/">Linux</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Network/">Network</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"weiwang1206"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+</section>
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:weiwang1206.github.io/">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/categories/Linux/">Linux</a><small>3</small></li>
+  
+    <li><a href="/categories/Network/">Network</a><small>2</small></li>
+  
+    <li><a href="/categories/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/categories/Others/">Others</a><small>1</small></li>
+  
+    <li><a href="/categories/Photo/">Photo</a><small>2</small></li>
+  
+    <li><a href="/categories/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/categories/Research/">Research</a><small>1</small></li>
+  
+    <li><a href="/categories/Ryu/">Ryu</a><small>10</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Controller/">Controller</a><small>16</small></li>
+  
+    <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
+  
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
+  
+    <li><a href="/tags/Hexo/">Hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux/">Linux</a><small>3</small></li>
+  
+    <li><a href="/tags/Network/">Network</a><small>7</small></li>
+  
+    <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/tags/Photo/">Photo</a><small>1</small></li>
+  
+    <li><a href="/tags/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/tags/Ryu/">Ryu</a><small>10</small></li>
+  
+    <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
+  
+    <li><a href="/tags/github/">github</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 Wei Wang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>

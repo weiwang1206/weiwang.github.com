@@ -1,0 +1,308 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>IO-Multiplex-1 | Wei's Blog</title>
+  <meta name="author" content="Wei Wang">
+  
+  <meta name="description" content="select
+select是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。
+//linux system
+#include&lt;sys/select.h&gt;
+int select(int">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="IO-Multiplex-1"/>
+  <meta property="og:site_name" content="Wei's Blog"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Wei's Blog" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fee42232f9a9cfb4d15d91b1d836dbc7e' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'true']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">Wei's Blog</a></h1>
+  <h2><a href="/">Build my new life</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-09-21T09:13:04.000Z"><a href="/2015/09/21/io-multiplex-2-select/">9月 21 2015</a></time>
+      
+      
+  
+    <h1 class="title">IO-Multiplex-1</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>select</p>
+<p><strong>select</strong>是最简单的最基础的IO多路复用技术，用句时髦的话叫 “de facto method&quot;，已经成为事实的一种方法。闲话少说，我们直接来看看这个函数。</p>
+<pre><code><span class="comment">//linux system</span>
+<span class="preprocessor">#include&lt;sys/select.h&gt;</span>
+<span class="keyword">int</span> <span class="keyword">select</span>(<span class="keyword">int</span> maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,<span class="keyword">struct</span> timeval *timeout)
+<span class="keyword">struct</span> timeval{
+    <span class="keyword">long</span> tv_sec; /second
+    <span class="keyword">long</span> tv_usec;/micro seconds
+}</code></pre>
+<p>以及配套使用的宏</p>
+<pre><code>#include&lt;sys/<span class="operator"><span class="keyword">select</span>.h&gt;
+<span class="keyword">int</span> FD_ISSET(<span class="keyword">int</span> fd, fd_set * fdset)
+<span class="keyword">int</span> FD_CLR(<span class="keyword">int</span> fd, fd_set * fdset)
+<span class="keyword">int</span> FD_SET(<span class="keyword">int</span> fd, fd_set * fdset)
+<span class="keyword">int</span> FD_ZREO(fd_set * fdset)</code></pre>
+<p>关于select的用法，直接上最简单版本的代码，代码是最好的解释~~~</p>
+<pre><code>main()  
+{  
+    int sock;  
+    int *file;  
+    struct fd_set fds;
+    struct timeval timeout={<span class="number">3</span>,<span class="number">0</span>}; //select等待<span class="number">3</span>秒，<span class="number">3</span>秒轮询，要非阻塞就置<span class="number">0</span>  
+    char buffer[<span class="number">256</span>]={<span class="number">0</span>}; //<span class="number">256</span>字节的接收缓冲区  
+    /* 假定已经建立TCP listen socket 
+    sock=socket(<span class="keyword">...</span>); 
+    bind(<span class="keyword">...</span>); 
+    file=open(<span class="keyword">...</span>); */  
+    <span class="keyword">while</span>(<span class="number">1</span>)  
+    {  
+        FD_ZERO(&amp;fds); //每次循环都要清空集合，否则不能检测描述符变化  
+        FD_SET(sock,&amp;fds); //添加描述符  
+        FD_SET(file,&amp;fds); //同上  
+        maxfdp=sock&gt;fp?sock+<span class="number">1</span>:fp+<span class="number">1</span>;//描述符最大值加<span class="number">1</span>，其实如果描述符集合不变，这句可以放在循环外
+        select(maxfdp,&amp;fds,<span class="literal">NULL</span>,<span class="literal">NULL</span>,&amp;timeout))   //select使用  
+
+        <span class="keyword">if</span> (ret &lt; <span class="number">0</span>)
+        {  
+            perror(<span class="string">"select"</span>);  
+            <span class="keyword">break</span>;  
+        } <span class="keyword">else</span> <span class="keyword">if</span> (ret == <span class="number">0</span>) {  
+            printf(<span class="string">"timeout\n"</span>);  
+            continue;  
+        }
+
+        <span class="keyword">if</span> (FD_ISSET(sock, &amp;fds)) {监听socket有数据可读
+            int s = accept(<span class="keyword">...</span>) //建立tcp链接
+            //<span class="keyword">...</span>
+        }
+        <span class="keyword">if</span> (FD_ISSET(file, &amp;fds)) {//文件有可读数据
+            int num = read(file,<span class="keyword">...</span>)
+        }
+
+     }//end <span class="keyword">while</span>  
+}//end main</code></pre>
+<p>fds是需要内核监听的文件描述符集合，类型是fd_set结构体。select函数的作用是监听多个描述符的事件，因此我们这里假设有两个描述符，一个是server端的socket套接字sock，和文件描述符fd。 然后进入while死循环。在while循环中，每次都需要情况fds，因为fds是用来标记哪个描述有未处理的事件，因此每次调用select之前要先情况，并且重新添加需要监测的描述符，使用FD_SET函数，将sock和file加入fds（<strong>NOTE：这也是select函数效率较低的原因之一</strong>）。然后计算出描述符中最大的值+1，作为select的参数之一，我们这里只有两个描述符，因此简单比较一个即可，如果有多个描述符，还需要计算出。然后调用select函数，第一个参数是maxfdp，第二个参数是我们关心可读事件的描述符集合，第三个是关心的可写的描述符集合，第四个是关心异常事件的描述符集合，我们这里只关注可读事件，因此将第二个参数传入fds，最后一个参数是time_out，在APUE中，time_out有三种值<br>- NULL, 永远等待。直到描述符有事件发生或收到一个错误信号。<br>- time_out-&gt;tv_sec = 0, time_out-&gt;tv_usec = 0, 不等待，立即返回，不阻塞。<br>- time_out-&gt;tv_sec != 0, time_out-&gt;tv_usec = !0, 等待制定的时间或有事件发生就返回。</p>
+<p>当select函数返回后，如果返回值小于0， 就出错了；如果等于0，意味着等待超时并在这段事件没有事件发生。</p>
+<p>如果ret大于0，就是我们希望出现的结果了，YES。但是我们监听了很多描述符，到底是哪个描述符有事件呢，我们并不知道，select函数也没告诉我们。select只将fds完全返回，并将其中有事件的置位，没有事件的置0，因此我们需要逐一判断到底哪个描述符有事件了（<strong>这就是另一个select效率低下的原因</strong>）。在本代码中，我们有两个描述符，因此使用FD_ISSET函数判断了两次，如果有很多的描述符参与，则需要使用循环监测每一个。如果FD_ISSET返回非0，则该描述符有事件发生，我们可以执行响应的操作。然后循环重新开始，清除fds，重新添加描述符。</p>
+<p>这就是select函数的用法，很简单吧！配合多进程，我们可以写一个<strong>并发量不太大</strong>的webServer，代码见<a href="http://" target="_blank">selectServer.c</a></p>
+<p>导致<strong>select并发量不太大的原因</strong>主要是因为：</p>
+<ol>
+<li>描述符数量限制，硬编码在内核中，最大1024个</li>
+<li>每次调用都需要将整个fdset从用户空间拷贝到内核空间，返回时再从内核空间拷贝的用户空间，这是非常耗时的</li>
+<li>当select进入内核态后，也需要遍历fdset，来寻找哪个描述符的可读或可写被置位了，这种遍历对于大规模的fdset，效率非常低。<br> 关于select的实现可以参考，<a href="http://blog.csdn.net/lizhiguo0532/article/details/6568964#comments" target="_blank">select实现分析</a></li>
+<li>select返回后，需要对整个fdset进行遍历才知道哪些fd被置位了（可读或可写），效率较低。</li>
+</ol>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Linux/">Linux</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Network/">Network</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"weiwang1206"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+</section>
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:weiwang1206.github.io/">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/categories/Linux/">Linux</a><small>3</small></li>
+  
+    <li><a href="/categories/Network/">Network</a><small>2</small></li>
+  
+    <li><a href="/categories/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/categories/Others/">Others</a><small>1</small></li>
+  
+    <li><a href="/categories/Photo/">Photo</a><small>2</small></li>
+  
+    <li><a href="/categories/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/categories/Research/">Research</a><small>1</small></li>
+  
+    <li><a href="/categories/Ryu/">Ryu</a><small>10</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/Controller/">Controller</a><small>16</small></li>
+  
+    <li><a href="/tags/DataCenter Network/">DataCenter Network</a><small>1</small></li>
+  
+    <li><a href="/tags/Floodlight/">Floodlight</a><small>6</small></li>
+  
+    <li><a href="/tags/Flow Schedule/">Flow Schedule</a><small>1</small></li>
+  
+    <li><a href="/tags/Hexo/">Hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/Linux/">Linux</a><small>3</small></li>
+  
+    <li><a href="/tags/Network/">Network</a><small>7</small></li>
+  
+    <li><a href="/tags/OpenStack/">OpenStack</a><small>1</small></li>
+  
+    <li><a href="/tags/Photo/">Photo</a><small>1</small></li>
+  
+    <li><a href="/tags/Python/">Python</a><small>2</small></li>
+  
+    <li><a href="/tags/Ryu/">Ryu</a><small>10</small></li>
+  
+    <li><a href="/tags/Switch/">Switch</a><small>1</small></li>
+  
+    <li><a href="/tags/github/">github</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 Wei Wang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
